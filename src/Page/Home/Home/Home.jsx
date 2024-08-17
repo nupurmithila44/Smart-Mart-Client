@@ -3,10 +3,13 @@ import axios from "axios";
 import Slider from "rc-slider";
 import { useEffect, useState } from "react";
 import useAxiosPublic from "../useAxiosPublic";
+import ProductCard from "../ProductCard";
 
 
 const Home = () => {
 const axiosPublic = useAxiosPublic()
+
+const [loading, setLoading] = useState(true);
 
     const [itemsPerPage, setItemsPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,38 +29,6 @@ const axiosPublic = useAxiosPublic()
         setPriceRange(value);
     };
 
-    console.log(products)
-      useEffect(() => {
-        const getData = async () => {
-          const { data } = await axios.get(
-            `${import.meta.env.VITE_API_URL}/products?page=${
-              currentPage - 1
-            }&size=${itemsPerPage}&category=${category}&brand=${brand}&priceRange=${priceRange}&sortByPrice=${sortByPrice}&sortByDate=${sortByDate}&search=${submittedSearch}`,
-            { withCredentials: true }
-          );
-          setProducts(data);
-        };
-        getData();
-      }, [
-        currentPage,
-        itemsPerPage,
-        category,
-        brand,
-        sortByPrice,
-        submittedSearch,
-        sortByDate,
-        priceRange,
-      ]);
- 
-    // const { data: products = [], isLoading, refetch } = useQuery({
-    //     queryKey: ['products'],
-    //     queryFn: async () => {
-    //         const { data } = await axiosPublic.get(`/products`);
-    //         return data;
-    //     },
-    // })
-    // console.log(products)
-
 
     useEffect(() => {
         const getCount = async () => {
@@ -70,6 +41,52 @@ const axiosPublic = useAxiosPublic()
         };
         getCount();
     }, [category, submittedSearch, brand, priceRange]);
+
+
+
+
+    useEffect(() => {
+        let isMounted = true;
+        const getData = async () => {
+          try {
+            setLoading(true); // Start loading
+            const { data } = await axios.get(
+              `${import.meta.env.VITE_API_URL}/products?page=${
+                currentPage - 1
+              }&size=${itemsPerPage}&category=${category}&brand=${brand}&priceRange=${priceRange}&sortByPrice=${sortByPrice}&sortByDate=${sortByDate}&search=${submittedSearch}`,
+              { withCredentials: true }
+            );
+            if (isMounted) {
+              setProducts(data);
+              setLoading(false); // Stop loading
+            }
+          } catch (error) {
+            console.error("Failed to fetch data:", error);
+            if (isMounted) setLoading(false); // Stop loading in case of error
+          }
+        };
+        getData();
+        return () => {
+          isMounted = false;
+        };
+      }, [
+        currentPage,
+        itemsPerPage,
+        category,
+        brand,
+        sortByPrice,
+        submittedSearch,
+        sortByDate,
+        priceRange,
+      ]);
+      
+      
+  
+ 
+
+    console.log(products)
+
+
 
     const handlePagination = (val) => {
         setCurrentPage(val);
@@ -358,6 +375,19 @@ const axiosPublic = useAxiosPublic()
 
 
                 {/* product cards */}
+                <div>
+    {loading ? (
+      <div className="spinner">Loading...</div> // Replace with your spinner component or CSS
+    ) : (
+        <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3">
+        {products?.map((product, idx) => (
+          <ProductCard key={idx} product={product} />
+        ))}
+      </div>
+    )}
+  </div>
+
+
                 {/* {products.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3">
             {products?.map((product, idx) => (
