@@ -1,13 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+// import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Slider from "rc-slider";
 import { useEffect, useState } from "react";
-import useAxiosPublic from "../useAxiosPublic";
+// import useAxiosPublic from "../useAxiosPublic";
 import ProductCard from "../ProductCard";
 
 
 const Home = () => {
-const axiosPublic = useAxiosPublic()
+
 
 const [loading, setLoading] = useState(true);
 
@@ -379,7 +379,7 @@ const [loading, setLoading] = useState(true);
     {loading ? (
       <div className="spinner">Loading...</div> // Replace with your spinner component or CSS
     ) : (
-        <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-2">
         {products?.map((product, idx) => (
           <ProductCard key={idx} product={product} />
         ))}
